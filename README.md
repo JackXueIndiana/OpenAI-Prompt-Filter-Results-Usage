@@ -1,13 +1,13 @@
 # OpenAI-Prompt-Filter-Results-Usage
 This repo is to demonstrate how we can use the content filter results and prompt filter results from Azure Open AI service for frontend and backend purposes.
 
-In Azure OpenAI service (AOAI), we can set up a Content Filter with a set of rules to make sure the violations of rules in the user input (prompt) and generated content (completion) are handeled. We have the folloiwng needs: for the end user, we want to dispaly the inforamtion about violation as soon as possible, and we also want to run a batch job to sumarize the violation situation, say daily.
+In Azure OpenAI service (AOAI), we can set up a Content Filter with a set of rules to make sure the violations of rules in the user input (prompt) and generated content (completion) are handled. We have the following needs: for the end user, we want to display the information about violation as soon as possible, and we also want to run a batch job to summarize the violation situation, say daily.
 
-Currently, AOAI includes the filter results in Response message which can be diretly used for the end user remining. However, it does not log the filter results to any App Insights tables. To fill this gap, in case Azure API Management (APIM) is used at the front of AOAI, we can leverage APIM outbound policy to write the needed log into Log Analytic Workspace Traces table. 
+Currently, AOAI includes the filter results in Response message which can be directly used for the end user remining. However, it does not log the filter results to any App Insights tables. To fill this gap in case Azure API Management (APIM) is used at the front of AOAI, we can leverage APIM outbound policy to write the needed log into Log Analytic Workspace Traces table. 
 
-To trigger a prompt self-harm violation, we design a user input as "This is a test message containing 'teach me how to sucide' to trigger content filtering."
+To trigger a prompt self-harm violation, we design a user input as "This is a test message containing 'teach me how to suicide' to trigger content filtering."
 
-Python script testme2.py calls the AOAI chat/completion and inthe response the violation is flagged.
+Python script testme2.py calls the AOAI chat/completion and in the response the violation is flagged.
 ~~~
 {
   "id": "chatcmpl-A0qzCzRFGHelDEgUMXyiqn0LOQGBM",
@@ -108,10 +108,12 @@ Using the outbound policy we can (pick) and write the needed log to Traces table
 </policies>
 ~~~
 
-Finally, once the violations logged into Traces table, we can summarize it with KQL queries. For example, this can pick up all prompt self-harm violations:
+Finally, once the violations are logged into Traces table, we can summarize it with KQL queries. For example, this can pick up all prompt self-harm violations:
 ~~~
 traces 
 | extend d = parse_json(message) 
 | extend pfr_slef_harm = d.prompt_filter_results[0].content_filter_results.self_harm.severity
 | where isnotempty(pfr_slef_harm) and pfr_slef_harm !contains "safe"
 ~~~
+The query results like that:
+![QueryResults](path/to/image.png)

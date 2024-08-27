@@ -116,4 +116,5 @@ traces
 | where isnotempty(pfr_slef_harm) and pfr_slef_harm !contains "safe"
 ~~~
 The query results like that:
+
 ![QueryResults](/QueryResults.png)

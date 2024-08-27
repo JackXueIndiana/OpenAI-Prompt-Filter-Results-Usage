@@ -118,3 +118,8 @@ traces
 The query results like that:
 
 ![QueryResults](/QueryResults.png)
+
+## Reference
+~~~
+https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/content-filter?tabs=warning%2Cuser-prompt%2Cpython-new
+~~~

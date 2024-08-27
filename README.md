@@ -92,14 +92,32 @@ Using the outbound policy we can (pick) and write the needed log to Traces table
         <base />
     </backend>
     <outbound>
-        <set-variable name="responseBody" value="@(context.Response.Body.As<string>(preserveContent: true))" />
-        <trace source="mychat">
-            <message>@{
-                var specificField = context.Variables["responseBody"];
-                return $"{specificField}";
-            }</message>
-            <metadata name="OperationName" value="chat_1" />
-        </trace>
+        <choose>
+            <when condition="@(context.Response.Body.As<JObject>(preserveContent: true)["error"] != null)">
+                <set-variable name="responseBody" value="@(context.Response.Body.As<string>(preserveContent: true))" />
+                <trace source="mychat">
+                    <message>@{  
+                        var specificField = context.Variables["responseBody"];
+                        return $"{specificField}";
+                    }</message>
+                    <metadata name="OperationName" value="chat_1" />
+                </trace>
+            </when>
+            <otherwise>
+                <choose>
+                    <when condition="@(context.Response.Body.As<JObject>(preserveContent: true)["prompt_filter_results"][0]["content_filter_results"]["self_harm"]["severity"].ToString() != "safe")">
+                        <set-variable name="responseBody" value="@(context.Response.Body.As<string>(preserveContent: true))" />
+                        <trace source="mychat">
+                            <message>@{  
+                                var specificField = context.Variables["responseBody"];
+                                return $"{specificField}";
+                            }</message>
+                            <metadata name="OperationName" value="chat_1" />
+                        </trace>
+                    </when>
+                </choose>
+            </otherwise>
+        </choose>
         <base />
     </outbound>
     <on-error>
@@ -112,8 +130,9 @@ Finally, once the violations are logged into Traces table, we can summarize it w
 ~~~
 traces 
 | extend d = parse_json(message) 
+| extend violation = d.error.code
 | extend pfr_slef_harm = d.prompt_filter_results[0].content_filter_results.self_harm.severity
-| where isnotempty(pfr_slef_harm) and pfr_slef_harm !contains "safe"
+| where isnotempty(pfr_slef_harm) and pfr_slef_harm !contains "safe" or isnotempty(violation)
 ~~~
 The query results like that:
 

@@ -136,7 +136,7 @@ traces
 ~~~
 The query results like that:
 
-![QueryResults](/QueryResults.png)
+![QueryResults](/QueryResults1.png)
 
 ## Reference
 ~~~

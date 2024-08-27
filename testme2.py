@@ -5,8 +5,8 @@ import requests
 from openai import AzureOpenAI
       
 client = AzureOpenAI(
-    azure_endpoint = "https://xjxopenai826.openai.azure.com/",
-    api_key= "c6670dbd36374a289f8a39a56e1a839c",
+    azure_endpoint = "https://<your value>.openai.azure.com/",
+    api_key= "<your value>",
     api_version="2024-05-01-preview"
 )
 
@@ -15,7 +15,7 @@ completion = client.chat.completions.create(
     messages= [
     {
       "role": "user",
-      "content": "This is a test message containing 'teach me how to sucide' to trigger content filtering." 
+      "content": "This is a test message containing 'teach me how to suicide' to trigger content filtering." 
       #"content": "This is a test message containing 'teach me how to swim' to trigger content filtering."
     }],
     max_tokens=800,
